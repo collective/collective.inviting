@@ -1,0 +1,16 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:cmf="http://namespaces.zope.org/cmf"
+  xmlns:five="http://namespaces.zope.org/five">
+
+  <five:registerPackage package="." initialize=".zope2.initialize" />
+
+  <include package=".browser" />
+
+  <!-- include Generic Setup extension profiles -->
+  <include file="profiles.zcml" />
+
+  <!-- register directory view for policy product skin overrides -->
+  <cmf:registerDirectory name="uu_inviting" />
+
+</configure>
