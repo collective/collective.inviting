@@ -12,5 +12,28 @@
 
   <!-- register directory view for policy product skin overrides -->
   <cmf:registerDirectory name="uu_inviting" />
+  
+  <adapter
+    factory=".item.ItemUID"
+    provides="uu.subscribe.interfaces.IUIDStrategy"
+    for="Products.Archetypes.interfaces.IReferenceable"
+    />
+
+  <adapter
+    factory=".adapters.SubscriberItems"
+    provides=".interfaces.ISubscriberItems"
+    for="uu.subscribe.interfaces.IItemSubscriber"
+    />
+  
+  <adapter
+    factory=".adapters.ContentSubscribers"
+    provides=".interfaces.IContentSubscribers"
+    for="Products.Archetypes.interfaces.IReferenceable"
+    />
+
+  <utility
+    factory=".item.ItemResolver"
+    provides="uu.subscribe.interfaces.IItemResolver"
+    />
 
 </configure>
