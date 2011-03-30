@@ -3,4 +3,11 @@
   xmlns:browser="http://namespaces.zope.org/browser"
   i18n_domain="uu.inviting">
 
+  <browser:page
+    for="Products.ATContentTypes.interfaces.event.IATEvent"
+    name="subscribers"
+    class=".subscribers.EventSubscribersView"
+    permission="cmf.ModifyPortalContent"
+    />
+
 </configure>

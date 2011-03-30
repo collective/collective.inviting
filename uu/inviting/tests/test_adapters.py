@@ -48,10 +48,12 @@ class AdapterTest(unittest.TestCase):
         assert IItemSubscriber.providedBy(csubs.find('invited')[0])
         assert len(csubs.find('confirmed')) == 0
         assert len(csubs.find('attended')) == 0
+        assert len(csubs.find()) == 1 #unamed, one subscription so far
         # index another name:
         csubs.index('confirmed', self.sub)
         assert self.sub in csubs.find('invited')
         assert self.sub in csubs.find('confirmed')
+        assert self.sub in csubs.find()
         # unindex, make sure item is not found:
         csubs.unindex('invited', self.sub)
         assert self.sub not in csubs.find('invited') #removed

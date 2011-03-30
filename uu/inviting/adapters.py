@@ -26,14 +26,17 @@ class ContentSubscribers(object):
         self.catalog = queryUtility(ISubscriptionCatalog)
         self.container = queryUtility(ISubscribers)
     
-    def find(self, name):
+    def find(self, name=None):
         """
         Find subscribers for which an index entry exists for the provided
         named subscription relationship, and for which a subscriber object
         exists (no orphaned index signature entries are included).
         """
         container = self.container
-        signatures = self.catalog.search({ name : self.uid })
+        if name is None:
+            signatures = self.catalog.search(self.uid)
+        else:
+            signatures = self.catalog.search({ name : self.uid })
         if not signatures:
             return []
         return [container.get(s) for s in signatures if s in container]
@@ -83,10 +86,13 @@ class SubscriberItems(object):
         if self.signature not in self.container:
             self.container.add(context)
     
-    def find(self, name):
+    def find(self, name=None):
         """ """
         resolver = queryUtility(IItemResolver)
-        uids = self.catalog.search({ name : self.signature })
+        if name is None:
+            uids = self.catalog.search(self.signature)
+        else:
+            uids = self.catalog.search({ name : self.signature })
         if not uids:
             return []
         return [o for o in [resolver.get(uid) for uid in uids] if o]
