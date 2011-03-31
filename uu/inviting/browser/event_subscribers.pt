@@ -127,10 +127,42 @@ form.subscriptions-form { clear:left; }
         <tr>
             <th>User</th>
             <th>Name</th>
-            <th>Namespace</th>
-            <th class="rel">Invited</th>
-            <th class="rel">Confirmed</th>
-            <th class="rel">Attended</th>
+            <th>Subscriber type</th>
+            <th class="rel"
+                tal:repeat="idx view/indexes"
+                tal:content="idx/title">Subscription name</th>
+        </tr>
+        <tr tal:repeat="sub view/subscribers">
+          <tal:block define="namespace sub/namespace;
+                             fullname python:sub.name or u'';
+                             email python:sub.email or '';
+                             username python:sub.user or email;">
+            <td class="susbscriber">
+              <span tal:condition="username" tal:content="username">USERNAME</span>
+              &nbsp;
+              <tal:block condition="python:email and email != username">
+                &lt;<span class="email" tal:content="email">EMAIL_IF_DISTINCT_FROM_USERNAME</span>&gt;
+              </tal:block>
+            </td>
+            <td tal:content="python:fullname or '--'">FULLNAME OR N/A</td>
+            <td tal:content="namespace">NAMESPACE OF USER</td>
+            <td class="rel"
+                tal:repeat="idx view/indexes"
+                tal:define="checked python:view.is_subscribed(sub, idx);
+                            inputname python:'%s/%s' % (username,idx);">
+              <tal:block condition="checked">
+                <input type="checkbox"
+                       checked="checked"
+                       name=""
+                       tal:attributes="name inputname" />
+              </tal:block>
+              <tal:block condition="python: not checked">
+                <input type="checkbox"
+                       name=""
+                       tal:attributes="name inputname" />
+              </tal:block>
+            </td>
+          </tal:block>
         </tr>
         <tr>
             <td class="subscriber">admin &lt;sean.upton@hsc.utah.edu&gt;</td>
@@ -155,11 +187,15 @@ form.subscriptions-form { clear:left; }
   <h3>Add invitations</h3>
   <form>
     <h4>List by group</h4>
-    <select class="membergroup" name="membergroup">
+    <select class="membergroup" name="membergroup" tal:define="groups view/enumerate_groups">
+      <option value="" tal:condition="view/result_group" tal:attributes="value view/result_group/getName" tal:content="python:view.result_group.title or view.result_group.getName()">SELECTED GROUP, IF ANY</option>
       <option value="">All members</option>
-      <option value="GroupA">Group A</option>
+      <option value=""
+              tal:repeat="group groups"
+              tal:attributes="value group/getName"
+              tal:content="python:group.title or group.getName()">GROUP TITLE</option>
     </select>
-    <input class="button" type="submit" value="List" />
+    <input class="button" type="submit" value="List" id="listgroup" name="listgroup" />
   </form>
   <form>
     <h4>Search members</h4>
@@ -167,16 +203,19 @@ form.subscriptions-form { clear:left; }
   </form>
   <form>
     <div class="member-search-results">
-      <p>Listing membership: 2 members in group [Group A]</p>
-      <p class="selectall"><a href="javascript:void(0)">[Select all]</a></p>
+      <tal:block define="hitcount python:len(view.add_result)">
+      <p tal:condition="hitcount">Listing membership: <span tal:content="hitcount">#</span> members matching query</p>
+      <p tal:condition="hitcount" class="selectall"><a href="javascript:void(0)">[Select all]</a></p>
+      </tal:block>
       <ul>
-        <li>
-          <input type="checkbox" value="('member','sean.upton@hsc.utah.edu')">
-          <span class="label">Sean Upton (sean.upton@hsc.utah.edu)</span>
-        </li>
-        <li>
-          <input type="checkbox" value="('member','sdupton@gmail.com')">
-          <span class="label">Sean Upton (sdupton@gmail.com)</span>
+        <li tal:repeat="matched_user view/add_result">
+          <tal:block define="username python:matched_user[0];
+                             fullname python:matched_user[1];">
+            <input type="checkbox" value=""
+                   tal:attributes="value python:'/'.join(('member',username))" />
+            <span class="label" tal:content="fullname">USER FULL NAME</span>
+            (<span class="label" tal:content="username">USER ID</span>)
+          </tal:block>
         </li>
       </ul>
     </div>
