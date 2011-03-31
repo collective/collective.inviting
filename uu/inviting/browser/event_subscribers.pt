@@ -1,0 +1,197 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="uu.inviting">
+<head>
+<metal:block fill-slot="javascript_head_slot">
+<script>
+ function toggleHighlight(el) {
+ 
+ }
+
+ jQuery(document).ready(function(){
+   jQuery("table.subscriptions td input").click(function(event){
+     jQuery(this).parent().addClass('modified');
+     jQuery(this).parent().parent().addClass('modified');
+   });
+   jQuery("div.member-search-results p.selectall a").click(function(event){
+     jQuery("div.member-search-results ul li input:checkbox").attr("checked", "CHECKED");
+   });
+   jQuery("div.eventDetails").clone(true,true).appendTo("div.summary");
+   jQuery("div.event-content").remove();
+ });
+
+</script>
+</metal:block>
+<metal:block fill-slot="style_slot">
+<style>
+
+form.subscriptions-form {
+    margin:1em;
+    width:45em;
+    border: 0.1em solid #ddd;
+}
+
+table.subscriptions {
+    width:100%;
+    margin: 0.4em 0;
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+}
+
+table.subscriptions tr th {
+    background-color:#def;
+    padding:0 0.5em;
+    text-align:center;
+    font-size:80%;
+}
+
+table.subscriptions tr th {
+    border-bottom: 1px solid #ddd;
+    background-color:#def;
+    padding:0 0.5em;
+    text-align:center;
+}
+
+table.subscriptions tr td {
+    font-size: 90%;
+    text-align:center;
+    padding:0.1em 1em;
+}
+
+table.subscriptions tr.modified td {
+    background-color: #ff9;
+}
+
+table.subscriptions tr td.modified {
+    background-color: #fd9;
+}
+
+table.subscriptions tr td.subscriber {
+    padding-left:0.3em;
+    text-align:left;
+    font-weight:bold;
+    color:#066;
+}
+
+table.subscriptions tr td {
+    border-bottom: 1px solid #ddd;
+}
+
+table.subscriptions tr .rel {
+    color:#066;
+    border-left: 1px solid #ddd;
+}
+
+p.help {
+    font-size:85%;
+    color:#999;
+    padding-left:0.3em;
+    font-style:italic;
+}
+
+div.searchmembers { border:0.1em solid #999; width:32em; margin:1em; }
+div.searchmembers h4 { font-size:70%; font-weight:normal; font-style:italic; float:left; width:8em; text-align:right; padding-right:0.5em; }
+div.searchmembers form { display:block; margin-bottom:0.3em; }
+div.searchmembers form select.membergroup { min-width:20em; }
+div.searchmembers form input.membersearch { width:19.5em; }
+div.searchmembers form input.button { width:5em; }
+div.searchmembers div.member-search-results { margin:1em; }
+div.searchmembers div.member-search-results ul { list-style-type:none; }
+div.searchmembers p { font-size:80%; color:#89b; }
+div.member-search-results li { font-size:85%; display:block; margin-top:0.5em; }
+div.searchmembers form textarea.emailinput { width:19em; height:9em;}
+div.searchmembers form input.submit-invite { margin:0.5em 8.4em; display:block; }
+div.searchmembers p.selectall { float:right; margin-top:0.5em; background-color:#ffb; }
+
+div.summary { background-color:#0f0; }
+div.summary div.description { float:left; }
+div.eventDetails { float:right; background-color:#fff; }
+form.subscriptions-form { clear:left; }
+</style>
+</metal:block>
+</head>
+<body>
+<div metal:fill-slot="main">
+  <div class="summary">
+   <div class="description">
+    <h3><em>Event invitations for:</em> <span tal:content="context/title">Item title</span></h3>
+    <p tal:content="context/Description">description</p>
+   </div>
+  </div>
+  <form class="subscriptions-form">
+    <p class="help">The following users are subscribers to this event as either invitees, confirmed RSVPs, or attendees.  Each users status may be modified using the checkbox grid below, and you may add additional users using the form below.</p>
+    <table class="subscriptions">
+        <tr>
+            <th>User</th>
+            <th>Name</th>
+            <th>Namespace</th>
+            <th class="rel">Invited</th>
+            <th class="rel">Confirmed</th>
+            <th class="rel">Attended</th>
+        </tr>
+        <tr>
+            <td class="subscriber">admin &lt;sean.upton@hsc.utah.edu&gt;</td>
+            <td>Sean Upton</td>
+            <td>member</td>
+            <td class="rel"><input type="checkbox" checked="checked" name="invited" /></td>
+            <td class="rel"><input type="checkbox" name="confirmed" /></td>
+            <td class="rel"><input type="checkbox" name="attended" /></td>
+        </tr>
+        <tr>
+            <td class="subscriber">&lt;guest@example.com&gt;</td>
+            <td>Sean Upton</td>
+            <td>email</td>
+            <td class="rel"><input type="checkbox" checked="checked" name="invited" /></td>
+            <td class="rel"><input type="checkbox" name="confirmed" /></td>
+            <td class="rel"><input type="checkbox" name="attended" /></td>
+        </tr>
+    </table>
+    <input type="submit" value="Save changes" />
+ </form>
+ <div class="searchmembers">
+  <h3>Add invitations</h3>
+  <form>
+    <h4>List by group</h4>
+    <select class="membergroup" name="membergroup">
+      <option value="">All members</option>
+      <option value="GroupA">Group A</option>
+    </select>
+    <input class="button" type="submit" value="List" />
+  </form>
+  <form>
+    <h4>Search members</h4>
+    <input class="membersearch" name="membersearch" /> <input class="button" type="submit" value="Search" />
+  </form>
+  <form>
+    <div class="member-search-results">
+      <p>Listing membership: 2 members in group [Group A]</p>
+      <p class="selectall"><a href="javascript:void(0)">[Select all]</a></p>
+      <ul>
+        <li>
+          <input type="checkbox" value="('member','sean.upton@hsc.utah.edu')">
+          <span class="label">Sean Upton (sean.upton@hsc.utah.edu)</span>
+        </li>
+        <li>
+          <input type="checkbox" value="('member','sdupton@gmail.com')">
+          <span class="label">Sean Upton (sdupton@gmail.com)</span>
+        </li>
+      </ul>
+    </div>
+    <h4>Enter email addresses (separated by commas and/or spaces)</h4>
+    <textarea class="emailinput" name="email"></textarea>
+    <input class="submit-invite" type="submit" value="Invite selected" />
+    <p>By submitting this form, all selected members and email addresses listed will be added to the invitiation.</p>
+  </form>
+ </div>
+
+<div class="event-content">
+<metal:block use-macro="context/event_view/macros/content-core">
+</metal:block>
+</div>
+
+</div>
+</body>
+</html>
