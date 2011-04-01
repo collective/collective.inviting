@@ -121,7 +121,7 @@ form.subscriptions-form { clear:left; }
     <p tal:content="context/Description">description</p>
    </div>
   </div>
-  <form class="subscriptions-form">
+  <form class="subscriptions-form" method="POST">
     <p class="help">The following users are subscribers to this event as either invitees, confirmed RSVPs, or attendees.  Each users status may be modified using the checkbox grid below, and you may add additional users using the form below.</p>
     <table class="subscriptions">
         <tr>
@@ -144,48 +144,33 @@ form.subscriptions-form { clear:left; }
                 &lt;<span class="email" tal:content="email">EMAIL_IF_DISTINCT_FROM_USERNAME</span>&gt;
               </tal:block>
             </td>
-            <td tal:content="python:fullname or '--'">FULLNAME OR N/A</td>
+            <td tal:content="python:fullname or view.member_fullname(username)">FULLNAME OR N/A</td>
             <td tal:content="namespace">NAMESPACE OF USER</td>
             <td class="rel"
-                tal:repeat="idx view/indexes"
-                tal:define="checked python:view.is_subscribed(sub, idx);
-                            inputname python:'%s/%s' % (username,idx);">
-              <tal:block condition="checked">
-                <input type="checkbox"
-                       checked="checked"
-                       name=""
-                       tal:attributes="name inputname" />
-              </tal:block>
-              <tal:block condition="python: not checked">
-                <input type="checkbox"
-                       name=""
-                       tal:attributes="name inputname" />
-              </tal:block>
+                tal:repeat="idx view/indexes">
+              <tal:define define="checked python:view.is_subscribed(sub, idx);
+                                  inputname python:'/'.join((idx,namespace,username));">
+                <tal:block condition="checked">
+                  <input type="checkbox"
+                         checked="CHECKED"
+                         name=""
+                         tal:attributes="name inputname" />
+                </tal:block>
+                <tal:block condition="python: not checked">
+                  <input type="checkbox"
+                         name=""
+                         tal:attributes="name inputname" />
+                </tal:block>
+              </tal:define>
             </td>
           </tal:block>
         </tr>
-        <tr>
-            <td class="subscriber">admin &lt;sean.upton@hsc.utah.edu&gt;</td>
-            <td>Sean Upton</td>
-            <td>member</td>
-            <td class="rel"><input type="checkbox" checked="checked" name="invited" /></td>
-            <td class="rel"><input type="checkbox" name="confirmed" /></td>
-            <td class="rel"><input type="checkbox" name="attended" /></td>
-        </tr>
-        <tr>
-            <td class="subscriber">&lt;guest@example.com&gt;</td>
-            <td>Sean Upton</td>
-            <td>email</td>
-            <td class="rel"><input type="checkbox" checked="checked" name="invited" /></td>
-            <td class="rel"><input type="checkbox" name="confirmed" /></td>
-            <td class="rel"><input type="checkbox" name="attended" /></td>
-        </tr>
     </table>
-    <input type="submit" value="Save changes" />
+    <input type="submit" value="Save changes" name="submatrix_modify" />
  </form>
  <div class="searchmembers">
   <h3>Add invitations</h3>
-  <form>
+  <form method="POST">
     <h4>List by group</h4>
     <select class="membergroup" name="membergroup" tal:define="groups view/enumerate_groups">
       <option value="" tal:condition="view/result_group" tal:attributes="value view/result_group/getName" tal:content="python:view.result_group.title or view.result_group.getName()">SELECTED GROUP, IF ANY</option>
@@ -197,22 +182,25 @@ form.subscriptions-form { clear:left; }
     </select>
     <input class="button" type="submit" value="List" id="listgroup" name="listgroup" />
   </form>
-  <form>
+  <form method="POST">
     <h4>Search members</h4>
     <input class="membersearch" name="membersearch" /> <input class="button" type="submit" value="Search" />
   </form>
-  <form>
+  <form method="POST">
     <div class="member-search-results">
       <tal:block define="hitcount python:len(view.add_result)">
-      <p tal:condition="hitcount">Listing membership: <span tal:content="hitcount">#</span> members matching query</p>
+        <p tal:condition="hitcount">
+            Listing membership: <span tal:content="hitcount">#</span> members matching query
+            (<span style="font-weight:bold; font-size:120%;" tal:content="python:request.form.get('membersearch', request.form.get('membergroup', '')) or '[All members]'">QUERY GROUP OR SEARCH TERM</span>)
+        </p>
       <p tal:condition="hitcount" class="selectall"><a href="javascript:void(0)">[Select all]</a></p>
       </tal:block>
       <ul>
         <li tal:repeat="matched_user view/add_result">
           <tal:block define="username python:matched_user[0];
                              fullname python:matched_user[1];">
-            <input type="checkbox" value=""
-                   tal:attributes="value python:'/'.join(('member',username))" />
+            <input type="checkbox" name=""
+                   tal:attributes="name python:'/'.join(('member',username))" />
             <span class="label" tal:content="fullname">USER FULL NAME</span>
             (<span class="label" tal:content="username">USER ID</span>)
           </tal:block>
@@ -220,7 +208,7 @@ form.subscriptions-form { clear:left; }
       </ul>
     </div>
     <h4>Enter email addresses (separated by commas and/or spaces)</h4>
-    <textarea class="emailinput" name="email"></textarea>
+    <textarea class="emailinput" name="add_email"></textarea>
     <input class="submit-invite" type="submit" value="Invite selected" />
     <p>By submitting this form, all selected members and email addresses listed will be added to the invitiation.</p>
   </form>
