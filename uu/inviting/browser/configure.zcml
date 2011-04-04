@@ -5,7 +5,7 @@
 
   <browser:page
     for="Products.ATContentTypes.interfaces.event.IATEvent"
-    name="subscribers"
+    name="invitations"
     class=".subscribers.EventSubscribersView"
     template="event_subscribers.pt"
     permission="cmf.ModifyPortalContent"

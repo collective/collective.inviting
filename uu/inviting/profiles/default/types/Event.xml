@@ -5,7 +5,7 @@
  <action title="Invitations"
          action_id="invitations"
          category="object"
-         url_expr="string:${object_url}/@@subscribers"
+         url_expr="string:${object_url}/@@invitations"
          visible="True">
   <permission value="Modify portal content"/>
  </action>
