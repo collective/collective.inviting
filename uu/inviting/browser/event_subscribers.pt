@@ -102,7 +102,7 @@ div.searchmembers div.member-search-results { margin:1em; }
 div.searchmembers div.member-search-results ul { list-style-type:none; }
 div.searchmembers p { font-size:80%; color:#89b; }
 div.member-search-results li { font-size:85%; display:block; margin-top:0.5em; }
-div.searchmembers form textarea.emailinput { width:19em; height:9em;}
+div.searchmembers form textarea.emailinput { width:10em; height:9em;}
 div.searchmembers form input.submit-invite { margin:0.5em 8.4em; display:block; }
 div.searchmembers p.selectall { float:right; margin-top:0.5em; background-color:#ffb; }
 

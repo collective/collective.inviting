@@ -4,6 +4,7 @@ from zope.component import queryUtility, getSiteManager
 
 from uu.inviting.tests.layers import DEFAULT_PROFILE_TESTING
 from uu.subscribe.interfaces import ISubscribers, ISubscriptionCatalog
+from uu.subscribe.interfaces import ISubscriptionKeys
 
 
 class DefaultProfileTest(unittest.TestCase):
@@ -46,4 +47,14 @@ class DefaultProfileTest(unittest.TestCase):
         assert catalog is not None
         sm = getSiteManager(self.portal)
         assert catalog is sm.queryUtility(ISubscriptionCatalog)
+    
+    def test_installed_subkeys(self):
+        """
+        locally installed persistent subscription keys mapping utility
+        """
+        subkeys = queryUtility(ISubscriptionKeys)
+        assert subkeys is not None
+        sm = getSiteManager(self.portal)
+        assert subkeys is sm.queryUtility(ISubscriptionKeys)
+
 
