@@ -11,6 +11,47 @@ from uu.subscribe.interfaces import ISubscriptionCatalog, IUIDStrategy
 from uu.subscribe.interfaces import ISubscribers
 
 
+# Template (format) strings for email invitation messages:
+RSVP_URL_TEMPLATE = '%(SITE_URL)s/@@confirm?s=%(TOKEN)s'
+INVITE_EMAIL_SUBJ = 'Invitation: %(ITEM_TITLE)s'
+INVITE_EMAIL_BODY = """
+%(FROM_NAME)s (%(FROM_EMAIL)s) has invited you to an event:
+
+What: %(ITEM_TITLE)s
+
+When: %(DATE_FORMATTED)s
+      %(TIME_FORMATTED)s
+
+Description:
+%(ITEM_DESCRIPTION)s
+
+You can RSVP a confirmation to the meeting organizer indicating that you
+will attend this event by visiting:
+
+ %(RSVP_URL)s
+
+More information:
+
+ %(ITEM_URL)s
+
+A vCal file, suitable for adding this event to calendaring software such as
+iCal, Microsoft Outlook, and Google Calendar is attached.
+
+--- 
+
+Received this email in error?  Have questions?
+
+ Please contact %(FROM_EMAIL)s, the original sender of this
+ invitation to you (you can reply to this message to do so).
+"""
+
+MESSAGE_TEMPLATE = """
+From:
+Reply-to:
+To: 
+Content-type: 
+""".strip()
+
 class SubscribersView(object):
     """
     Subscribers view of content item, shows lists of 
@@ -141,7 +182,7 @@ class SubscribersView(object):
             mto_name = ''
         else:
             raise ValueError('unhandled subscriber signature namespace')
-        subject = 'Invitation: %s' % self.context.Title()
+        subject = INVITE_EMAIL_SUBJ % {'ITEM_TITLE' : self.context.Title()}
         sender = self._mtool.getAuthenticatedMember()
         reply_to_addr = sender.getProperty('email') or self._mailfrom[1]
         reply_to_name = sender.getProperty('fullname') or self._mailfrom[0]

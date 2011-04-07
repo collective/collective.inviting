@@ -1,3 +1,6 @@
+from zope.interface import Interface
+from zope import schema
+
 from uu.subscribe.interfaces import ISubscribersOf, IItemsFor
 
 
@@ -51,4 +54,21 @@ class ISubscriberItems(IItemsFor):
         [U]UID), remove/unindex any matching subscription in the local
         subscription catalog.
         """
+
+
+class IMailSender(Interface):
+    """Email sender metadata"""
+    
+    from_name = schema.TextLine(required=False)
+    from_address = schema.BytesLine()
+    reply_name = schema.TextLine(required=False)
+    reply_address = schema.BytesLine()
+
+
+class IMailRecipient(Interface):
+    """Email recipient metadata"""
+    address = schema.BytesLine(title=u'Email address', required=True)
+    name = schema.TextLine(title=u'Name',
+                           description=u'Full name',
+                           required=False)
 

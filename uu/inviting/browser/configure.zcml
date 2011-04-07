@@ -10,5 +10,12 @@
     template="event_subscribers.pt"
     permission="cmf.ModifyPortalContent"
     />
+  
+  <browser:page
+    for="Products.ATContentTypes.interfaces.event.IATEvent"
+    name="invitation_email"
+    class=".message.InvitationEmail"
+    permission="zope2.View"
+    />
 
 </configure>
