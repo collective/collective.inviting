@@ -245,7 +245,7 @@ class EventSubscribersView(SubscribersView):
     """Event-specific subscription view"""
 
     def indexes(self):
-        _indexes = ['invited', 'confirmed', 'attended']
+        _indexes = ['invited', 'confirmed', 'declined', 'attended']
         catalog_indexes = super(EventSubscribersView, self).indexes()
         _indexes += [idx for idx in catalog_indexes if idx not in _indexes]
         return tuple(_indexes)
