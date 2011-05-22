@@ -19,7 +19,7 @@ from uu.inviting.mail import MailRecipient, invitation_sender
 
 
 # Template (format) strings for email invitation messages:
-RSVP_URL_TEMPLATE = '%(SITE_URL)s/@@confirm?s=%(TOKEN)s'
+RSVP_URL_TEMPLATE = '%(SITE_URL)s/@@status?s=%(TOKEN)s'
 INVITE_EMAIL_SUBJ = 'Invitation: %(ITEM_TITLE)s'
 INVITE_EMAIL_BODY = """ 
 %(FROM_NAME)s (%(FROM_EMAIL)s) has invited you to an event:
@@ -32,8 +32,8 @@ When: %(DATE_FORMATTED)s
 Description:
 %(ITEM_DESCRIPTION)s
 
-You can RSVP a confirmation to the meeting organizer indicating that you
-will attend this event by visiting:
+You can confirm or decline your attendance of this event with the the meeting
+organizer by visiting the following link and indicating your status:
 
  %(RSVP_URL)s
 
