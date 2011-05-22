@@ -45,6 +45,7 @@ class AdapterTest(unittest.TestCase):
         csubs.index('invited', self.sub)
         assert self.sub in self.container # result of index through adapter
         assert self.sub in csubs.find('invited')
+        assert 'invited' in csubs.subscriptions_for(self.sub)
         assert IItemSubscriber.providedBy(csubs.find('invited')[0])
         assert len(csubs.find('confirmed')) == 0
         assert len(csubs.find('attended')) == 0
@@ -53,11 +54,14 @@ class AdapterTest(unittest.TestCase):
         csubs.index('confirmed', self.sub)
         assert self.sub in csubs.find('invited')
         assert self.sub in csubs.find('confirmed')
+        assert 'confirmed' in csubs.subscriptions_for(self.sub)
         assert self.sub in csubs.find()
         # unindex, make sure item is not found:
         csubs.unindex('invited', self.sub)
         assert self.sub not in csubs.find('invited') #removed
+        assert 'invited' not in csubs.subscriptions_for(self.sub)
         assert self.sub in csubs.find('confirmed')  #this still exists
+        assert 'confirmed' in csubs.subscriptions_for(self.sub)
         # verify that we can look from the other direction at what we've done:
         subitems = ISubscriberItems(self.sub)
         assert self.content in subitems.find('confirmed')

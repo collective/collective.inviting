@@ -41,6 +41,16 @@ class ContentSubscribers(object):
             return []
         return [container.get(s) for s in signatures if s in container]
     
+    def subscriptions_for(self, subscriber):
+        """Find subscription names for a given subscriber for the context"""
+        relnames = []
+        if IItemSubscriber.providedBy(subscriber):
+            subscriber = subscriber.signature()
+        for relname, index in self.catalog.indexes.items():
+            if subscriber in index.subscribers_for(self.uid):
+                relnames.append(relname)
+        return relnames
+     
     def index(self, name, subscriber):
         """ """
         # ensure subscriber is in container of subscribers

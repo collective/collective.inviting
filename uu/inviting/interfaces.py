@@ -7,7 +7,8 @@ from uu.subscribe.interfaces import ISubscribersOf, IItemsFor
 class IContentSubscribers(ISubscribersOf):
     """
     Content adapter interface to find subscribers, index subscriptions
-    by subsription name.  In addition to base interface find() method, this
+    by subsription name.  In addition to base interface find() and 
+    subscribers_for() methods providing query of subscribers in context, this
     interface declares index() and unindex() methods to maintain relationships
     in context of content and a site.
     
