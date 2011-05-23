@@ -219,6 +219,14 @@ form.subscriptions-form { clear:left; }
 </metal:block>
 </div>
 
+<div class="debug-output" tal:condition="python: 'debug' in view.request">
+ <h4>Mail messsages for all invitations (debug log):</h4>
+ <tal:block repeat="msg view/debug_msg_log">
+  <hr />
+  <pre tal:content="msg">mail message output</pre>
+ </tal:block>
+</div>
+
 </div>
 </body>
 </html>

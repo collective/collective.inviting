@@ -1,6 +1,6 @@
 import re
 
-from zope.component import queryUtility, getUtility
+from zope.component import queryUtility, getUtility, getMultiAdapter
 from zope.component.interfaces import ComponentLookupError
 from Products.CMFCore.interfaces import ISiteRoot
 
@@ -8,49 +8,13 @@ from Products.CMFCore.utils import getToolByName
 
 from uu.inviting.interfaces import IContentSubscribers
 from uu.subscribe.interfaces import ISubscriptionCatalog, IUIDStrategy
-from uu.subscribe.interfaces import ISubscribers
+from uu.subscribe.interfaces import ISubscribers, ISubscriptionKeys
+from uu.inviting.mail import MailRecipient
 
 
 # Template (format) strings for email invitation messages:
-RSVP_URL_TEMPLATE = '%(SITE_URL)s/@@confirm?s=%(TOKEN)s'
 INVITE_EMAIL_SUBJ = 'Invitation: %(ITEM_TITLE)s'
-INVITE_EMAIL_BODY = """
-%(FROM_NAME)s (%(FROM_EMAIL)s) has invited you to an event:
 
-What: %(ITEM_TITLE)s
-
-When: %(DATE_FORMATTED)s
-      %(TIME_FORMATTED)s
-
-Description:
-%(ITEM_DESCRIPTION)s
-
-You can RSVP a confirmation to the meeting organizer indicating that you
-will attend this event by visiting:
-
- %(RSVP_URL)s
-
-More information:
-
- %(ITEM_URL)s
-
-A vCal file, suitable for adding this event to calendaring software such as
-iCal, Microsoft Outlook, and Google Calendar is attached.
-
---- 
-
-Received this email in error?  Have questions?
-
- Please contact %(FROM_EMAIL)s, the original sender of this
- invitation to you (you can reply to this message to do so).
-"""
-
-MESSAGE_TEMPLATE = """
-From:
-Reply-to:
-To: 
-Content-type: 
-""".strip()
 
 class SubscribersView(object):
     """
@@ -77,12 +41,12 @@ class SubscribersView(object):
                 'could not locate installed local subscription catalog; '\
                 'is uu.inviting product correctly installed in site?')
         self._provider = IContentSubscribers(context)
-        self._mailfrom = (self._site.getProperty('email_from_name'),
-                          self._site.getProperty('email_from_address'))
         self._load_indexed()
         self.add_result = () #empty result, initially
         self.result_group = None #group name in add form, if used
-
+        self.sent_to = []
+        self.debug_msg_log = []
+    
     def _load_indexed(self):
         self.indexed = {}
         for idx in self.indexes():
@@ -168,30 +132,59 @@ class SubscribersView(object):
         input = re.sub('[\n ]+', ',', input)    #all whitespace -> comma
         return [addr for addr in input.split(',') if addr]
 
-    def _send_invitation_message(self, sub):
+    def _get_recipient(self, sub):
+        """
+        given subscriber as IItemSubscriber object, get recipient
+        as IMailRecipient (TODO: create an adapter for this?) or None.
+        """
         if sub.namespace == 'member':
             member = self._mtool.getMemberById(sub.user)
             if member is None:
-                return #silently ignoring members with no info
+                return None#silently ignoring members with no info
             mto = member.getProperty('email', None)
             if mto is None:
-                return #again, ignore if we have no email
+                return None #again, ignore if we have no email
             mto_name = member.getProperty('fullname', '')
         elif sub.namespace == 'email':
             mto = sub.email
             mto_name = ''
         else:
-            raise ValueError('unhandled subscriber signature namespace')
-        subject = INVITE_EMAIL_SUBJ % {'ITEM_TITLE' : self.context.Title()}
-        sender = self._mtool.getAuthenticatedMember()
-        reply_to_addr = sender.getProperty('email') or self._mailfrom[1]
-        reply_to_name = sender.getProperty('fullname') or self._mailfrom[0]
-        pass #TODO implement message send
-
+            return None # unhandled subscriber signature namespace
+        return MailRecipient(mto, mto_name)
+    
+    def _send_invitation_message(self, sub, token):
+        """given subscriber amd token, render and send invite email"""
+        recipient = self._get_recipient(sub) #get IMailRecipient object
+        if recipient is None:
+            return
+        self.request.form['token'] = token # passes token to message
+        msg = getMultiAdapter((self.context, self.request),
+            name=u'invitation_email')(recipient=recipient)
+        self._mail.send(msg)
+        self.sent_to.append(recipient) # can be usef by template: display log
+        if 'debug' in self.request.form:
+            self.debug_msg_log.append(msg)
+    
+    def tokenize(self, sub, idx='invited'):
+        subkeys = queryUtility(ISubscriptionKeys)
+        token = subkeys.add(idx, sub, self.uid)  # store sub, get token
+        return token
+    
+    def subscriptions_for(self, signature):
+        adapted = IContentSubscribers(self.context)
+        return adapted.subscriptions_for(signature)
+    
     def invite(self, sub, idx='invited'):
-        self._catalog.index(sub, self.uid, names=(idx,))
-        self._send_invitation_message(sub)
-
+        signature = sub.signature()
+        previously_invited = 'invited' in self.subscriptions_for(signature)
+        if not previously_invited:
+            self._catalog.index(sub, self.uid, names=(idx,))
+            token = self.tokenize(
+                signature,
+                idx
+                ) #store subscription generate token
+            self._send_invitation_message(sub, token)
+    
     def update(self, *args, **kwargs):
         form = self.request.form
         if 'listgroup' in form:
@@ -224,6 +217,7 @@ class SubscribersView(object):
                     sub = self._container[sig]
                 self.invite(sub)
             self._load_indexed() #reload fresh state for re-render
+            self.request.form['debug'] = '1' #TODO: remove this
         if 'submatrix_modify' in form:
             for idx in self.indexes():
                 existing_subs = set([sub.signature() for sub in self.indexed[idx]])
@@ -240,6 +234,7 @@ class SubscribersView(object):
     def __call__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         return self.index(*args, **kwargs)
+
 
 class EventSubscribersView(SubscribersView):
     """Event-specific subscription view"""

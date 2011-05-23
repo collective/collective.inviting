@@ -19,7 +19,7 @@ from uu.inviting.mail import MailRecipient, invitation_sender
 
 
 # Template (format) strings for email invitation messages:
-RSVP_URL_TEMPLATE = '%(SITE_URL)s/@@status?s=%(TOKEN)s'
+RSVP_URL_TEMPLATE = '%(SITE_URL)s/@@status?token=%(TOKEN)s'
 INVITE_EMAIL_SUBJ = 'Invitation: %(ITEM_TITLE)s'
 INVITE_EMAIL_BODY = """ 
 %(FROM_NAME)s (%(FROM_EMAIL)s) has invited you to an event:
