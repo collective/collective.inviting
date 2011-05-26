@@ -25,6 +25,7 @@ setup(name='uu.inviting',
           'setuptools',
           'uu.subscribe',
           'Products.CMFPlone',
+          'icalendar', # http://codespeak.net/icalendar/
           # -*- Extra requirements: -*-
       ],
       extras_require = {

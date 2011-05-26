@@ -5,6 +5,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from StringIO import StringIO
 
+import icalendar
 from Acquisition import aq_inner
 from zope.component import queryUtility, getUtility
 from zope.app.component.hooks import getSite
@@ -106,12 +107,23 @@ class InvitationEmail(object):
         message['Subject'] = 'Invitation: %s' % self.context.Title()
     
     def _vcal(self):
-        """Make vCal file stream for item context, return"""
+        """
+        Make vCal file stream for item context. VCS is modified with use
+        of the icalendar library to inject URL to event into the
+        description (generate, then parse, modify, reserialize).
+        Uses: http://codespeak.net/icalendar/
+        """
+        url = self.context.absolute_url()
         out = StringIO()
         out.write(VCS_HEADER % { 'prodid' : PRODID })
         out.write(self.context.getVCal())
         out.write(VCS_FOOTER)
-        return n2rn(out.getvalue())
+        vcs = n2rn(out.getvalue())
+        parsed = icalendar.Event.from_string(vcs)
+        description = parsed.subcomponents[0].get('description').format()
+        description = '%s\n\n  More info:\n\n  %s\n\n' % (description, url)
+        parsed.subcomponents[0].set('description', description)
+        return str(parsed) #return modified (description) vcs
     
     def _rsvp_url(self):
         token = self.request.get('token', None)
@@ -150,7 +162,7 @@ class InvitationEmail(object):
         encoders.encode_base64(attachment)
         attachment.add_header('Content-Disposition',
                               'attachment',
-                              filename='%s.vcs' % self.uid)
+                              filename='event.vcs')
         message.attach(attachment)
         return message.as_string()
 
