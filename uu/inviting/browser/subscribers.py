@@ -1,5 +1,10 @@
 import re
 
+try:
+    from email._parseaddr import AddressList
+except:
+    from rfc822 import AddressList
+
 from zope.component import queryUtility, getUtility, getMultiAdapter
 from zope.component.interfaces import ComponentLookupError
 from Products.CMFCore.interfaces import ISiteRoot
@@ -123,14 +128,12 @@ class SubscribersView(object):
 
     def _parse_email_input(self, input):
         """
-        Transform mixture of comma/whitespace delimited email addresses into
-        comma separated list, then split, return list.
+        Transform mixture of comma/whitespace into list of tuples of 
+        name, email for each address in input.
         """
         input = input.strip()                   #strip leading/trailing \s
         input = re.sub('\r\n','\n', input)      #CRLF  -> LF
-        input = re.sub(',', '\n', input)        #comma -> LF
-        input = re.sub('[\n ]+', ',', input)    #all whitespace -> comma
-        return [addr for addr in input.split(',') if addr]
+        return list(AddressList(input))
 
     def _get_recipient(self, sub):
         """
@@ -160,8 +163,9 @@ class SubscribersView(object):
         self.request.form['token'] = token # passes token to message
         msg = getMultiAdapter((self.context, self.request),
             name=u'invitation_email')(recipient=recipient)
-        self._mail.send(msg)
-        self.sent_to.append(recipient) # can be usef by template: display log
+        if 'nomail' not in self.request.form:
+            self._mail.send(msg)
+            self.sent_to.append(recipient) # can be usef by template: display log
         if 'debug' in self.request.form:
             self.debug_msg_log.append(msg)
     
@@ -202,17 +206,30 @@ class SubscribersView(object):
             add_email_addresses = self._parse_email_input(form['add_email'])
             add_members = [k.split('/')[1] for k,v in form.items() if k.startswith('member/') and v]
             # catalog email addresses and members with 'invited' relatiomship
-            signatures = []
-            for addr in add_email_addresses:
-                signatures.append(('email', addr))
-            for memberid in add_members:
-                signatures.append(('member', memberid))
-            for sig in signatures:
-                if sig not in self._container:
-                    if sig[0] == 'email':
-                        sig, sub = self._container.add(namespace=sig[0], email=sig[1])
+            for name, addr in add_email_addresses:
+                if addr:
+                    sig = ('email', addr)
+                    if sig not in self._container:
+                        sig, sub = self._container.add(
+                            namespace=sig[0],
+                            email=sig[1],)
                     else:
-                        sig, sub = self._container.add(namespace=sig[0], user=sig[1])
+                        sub = self._container[sig]
+                    if name:
+                        # always globally store the latest name; note: this
+                        # has the consequence of possibly overriding previous
+                        # values of name-to-email mappings affecting other
+                        # events, but this is the least-evil expedient way
+                        # to handle this without storing a name-to-email 
+                        # mapping for every event object context.
+                        sub.name = name.decode('utf-8')
+                    self.invite(sub)
+            for sig in [('member',m) for m in add_members]:
+                if sig not in self._container:
+                    sig, sub = self._container.add(
+                        namespace=sig[0],
+                        user=sig[1]
+                        )
                 else:
                     sub = self._container[sig]
                 self.invite(sub)
