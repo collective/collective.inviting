@@ -120,7 +120,7 @@ class InvitationEmail(object):
         out.write(VCS_FOOTER)
         vcs = n2rn(out.getvalue())
         parsed = icalendar.Event.from_string(vcs)
-        journal = [c for c in ev.subcomponents
+        journal = [c for c in parsed.subcomponents
                     if isinstance(c, icalendar.Journal)]
         if journal:
             description = journal[0].get(
