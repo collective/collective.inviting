@@ -120,9 +120,15 @@ class InvitationEmail(object):
         out.write(VCS_FOOTER)
         vcs = n2rn(out.getvalue())
         parsed = icalendar.Event.from_string(vcs)
-        description = parsed.subcomponents[0].get('description').format()
-        description = '%s\n\n  More info:\n\n  %s\n\n' % (description, url)
-        parsed.subcomponents[0].set('description', description)
+        journal = [c for c in ev.subcomponents
+                    if isinstance(c, icalendar.Journal)]
+        if journal:
+            description = journal[0].get(
+                'description',
+                icalendar.vText(), #default empty, if empty desc in vcs
+                ).format()
+            description = '%s\n\n  More info:\n\n  %s\n\n' % (description, url)
+            journal[0].set('description', description)
         return str(parsed) #return modified (description) vcs
     
     def _rsvp_url(self):
