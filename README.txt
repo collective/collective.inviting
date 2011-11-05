@@ -1,7 +1,7 @@
 Introduction
 ============
 
-uu.inviting is an add-on for Plone that manages event invitations, 
+collective.inviting is an add-on for Plone that manages event invitations, 
 confirmations, and attendance as stored, indexed relationships between
 users (members or guests) and event content items in a Plone site.
 
@@ -16,8 +16,8 @@ This package provides the following features:
  * Support both site members and guests (identifying with email) as 
    parties who can be invited.
 
- * Builds upon uu.subscribe, a general purpose set of components for
-   managing user relationships ("subscriptions") with content.
+ * Builds upon collective.subscribe, a general purpose set of components
+   for managing user relationships ("subscriptions") with content.
 
  * Users can change their confirmation status by re-visiting the
    confirmation link.
@@ -25,9 +25,9 @@ This package provides the following features:
  * A simple hash/token is included in emailed URLs to prevent abuse.
 
  * Provides utility and adapter registrations for components in
-   uu.subscribe for use in a Plone site.
+   collective.subscribe for use in a Plone site.
 
-Depends on uu.subscribe.
+Depends on collective.subscribe.
 
 --
 

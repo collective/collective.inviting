@@ -3,7 +3,7 @@ import os
 
 version = '0.1dev'
 
-setup(name='uu.inviting',
+setup(name='collective.inviting',
       version=version,
       description="Plone add-on for event invitations, confirmation.",
       long_description=open("README.txt").read() + "\n" +
@@ -15,15 +15,15 @@ setup(name='uu.inviting',
       keywords='',
       author='Sean Upton',
       author_email='sean.upton@hsc.utah.edu',
-      url='http://bazaar.launchpad.net/~seanupton/+junk/uu.inviting',
+      url='https://github.com/collective/collective.inviting',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['uu'],
+      namespace_packages=['collective'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
           'setuptools',
-          'uu.subscribe',
+          'collective.subscribe',
           'Products.CMFPlone',
           'icalendar', # http://codespeak.net/icalendar/
           # -*- Extra requirements: -*-

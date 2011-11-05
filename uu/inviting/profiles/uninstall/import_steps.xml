@@ -1,6 +1,0 @@
-<import-steps>
-  <import-step id="uu.inviting-uninstallcomponents"
-    handler="uu.inviting.setuphandlers.uninstall_local_components"
-    title="uninstall uu.inviting local components" version="1.0">
-  </import-step>
-</import-steps>

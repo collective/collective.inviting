@@ -1,0 +1,17 @@
+<import-steps>
+  <import-step id="collective.inviting-container"
+    handler="collective.inviting.setuphandlers.install_subscribers_container"
+    title="collective.inviting local components (subscribers container)" version="1.0">
+    <dependency step="plone-final"/>
+  </import-step>
+  <import-step id="collective.inviting-catalog"
+    handler="collective.inviting.setuphandlers.install_subscription_catalog"
+    title="collective.inviting local components (subscription catalog)" version="1.0">
+    <dependency step="plone-final"/>
+  </import-step>
+  <import-step id="collective.inviting-keys"
+    handler="collective.inviting.setuphandlers.install_subscription_keys"
+    title="collective.inviting local components (subscription keys)" version="1.0">
+    <dependency step="plone-final"/>
+  </import-step> 
+</import-steps>

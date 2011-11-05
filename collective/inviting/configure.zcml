@@ -1,0 +1,39 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:cmf="http://namespaces.zope.org/cmf"
+  xmlns:five="http://namespaces.zope.org/five">
+
+  <five:registerPackage package="." initialize=".zope2.initialize" />
+
+  <include package=".browser" />
+
+  <!-- include Generic Setup extension profiles -->
+  <include file="profiles.zcml" />
+
+  <!-- register directory view for policy product skin overrides -->
+  <cmf:registerDirectory name="collective_inviting" />
+  
+  <adapter
+    factory=".item.ItemUID"
+    provides="collective.subscribe.interfaces.IUIDStrategy"
+    for="Products.Archetypes.interfaces.IReferenceable"
+    />
+
+  <adapter
+    factory=".adapters.SubscriberItems"
+    provides=".interfaces.ISubscriberItems"
+    for="collective.subscribe.interfaces.IItemSubscriber"
+    />
+  
+  <adapter
+    factory=".adapters.ContentSubscribers"
+    provides=".interfaces.IContentSubscribers"
+    for="Products.Archetypes.interfaces.IReferenceable"
+    />
+
+  <utility
+    factory=".item.ItemResolver"
+    provides="collective.subscribe.interfaces.IItemResolver"
+    />
+
+</configure>

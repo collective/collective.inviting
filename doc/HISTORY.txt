@@ -1,8 +1,14 @@
 Changelog
 =========
 
-0.1dev (unreleased)
--------------------
+0.1
+---
 
-- In development
+- Initial release [seanupton].
+
+- Renamed from uu.inviting to collective.inviting, all dependencies on 
+  uu.subscribe moved to renamed collective.subscribe.
+
+- Install and uninstall profiles for three local persistent utility components.
+
 

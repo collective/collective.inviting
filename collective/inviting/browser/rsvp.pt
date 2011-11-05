@@ -1,0 +1,35 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="collective.inviting">
+<head>
+<metal:block fill-slot="javascript_head_slot">
+</metal:block>
+<metal:block fill-slot="style_slot">
+</metal:block>
+</head>
+<body>
+<div metal:fill-slot="main">
+
+<div class="rsvpbox">
+  <div class="message" tal:content="view/user_message">USER MESSAGE / PROMPT / ERROR</div>
+  <form method="POST" tal:condition="python: not view.form_error">
+    <div class="formhint">Confirm that you will attend:</div>
+    <input type="submit" name="button-confirm" value="Confirm attendance" />
+  </form>
+  <form method="POST" tal:condition="python: not view.form_error">
+    <div class="formhint">...or, please let us know that you will not attend:</div>
+    <input type="submit" name="button-decline" value="Decline invitation" />
+  </form>
+</div>
+
+<div class="event-content">
+<metal:block use-macro="context/event_view/macros/content-core">
+</metal:block>
+</div>
+
+</div>
+</body>
+</html>

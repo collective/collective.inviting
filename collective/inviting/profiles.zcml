@@ -1,0 +1,23 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+  i18n_domain="collective.inviting">
+     
+    <!-- register extension profiles for add-on --> 
+    <genericsetup:registerProfile
+        name="default"
+        title="uu.intiving: event invitation add-on"
+        directory="profiles/default"
+        description="Plone add-on enabling event invitation, confirmation."
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+    <genericsetup:registerProfile
+        name="uninstall"
+        title="Uninstall uu.intiving"
+        directory="profiles/uninstall"
+        description="Uninstall event inviation add-on collective.inviting"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+</configure>

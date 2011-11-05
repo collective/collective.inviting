@@ -1,0 +1,36 @@
+<configure
+  xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  i18n_domain="collective.inviting">
+
+  <browser:page
+    for="Products.ATContentTypes.interfaces.event.IATEvent"
+    name="invitations"
+    class=".subscribers.EventSubscribersView"
+    template="event_subscribers.pt"
+    permission="cmf.ModifyPortalContent"
+    />
+  
+  <browser:page
+    for="Products.ATContentTypes.interfaces.event.IATEvent"
+    name="invitation_email"
+    class=".message.InvitationEmail"
+    permission="zope2.View"
+    />
+  
+  <browser:page
+    for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
+    name="status"
+    class=".rsvp.RSVPRedirect"
+    permission="zope2.View"
+    />
+  
+  <browser:page
+    for="Products.ATContentTypes.interfaces.event.IATEvent"
+    name="status"
+    class=".rsvp.RSVP"
+    template="rsvp.pt"
+    permission="zope2.View"
+    />
+
+</configure>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<object name="portal_skins">
+ <object name="collective_inviting"
+     meta_type="Filesystem Directory View"
+     directory="collective.inviting:skins/collective_inviting"/>
+ <skin-path name="Sunburst Theme">
+  <layer name="collective_inviting" insert-after="custom" />
+ </skin-path>
+</object>

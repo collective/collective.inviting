@@ -1,0 +1,232 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="collective.inviting">
+<head>
+<metal:block fill-slot="javascript_head_slot">
+<script>
+ function toggleHighlight(el) {
+ 
+ }
+
+ jQuery(document).ready(function(){
+   jQuery("table.subscriptions td input").click(function(event){
+     jQuery(this).parent().addClass('modified');
+     jQuery(this).parent().parent().addClass('modified');
+   });
+   jQuery("div.member-search-results p.selectall a").click(function(event){
+     jQuery("div.member-search-results ul li input:checkbox").attr("checked", "CHECKED");
+   });
+   jQuery("div.eventDetails").clone(true,true).appendTo("div.summary");
+   jQuery("div.event-content").remove();
+ });
+
+</script>
+</metal:block>
+<metal:block fill-slot="style_slot">
+<style>
+
+form.subscriptions-form {
+    margin:1em;
+    width:45em;
+    border: 0.1em solid #ddd;
+}
+
+table.subscriptions {
+    width:100%;
+    margin: 0.4em 0;
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #aaa;
+}
+
+table.subscriptions tr th {
+    background-color:#def;
+    padding:0 0.5em;
+    text-align:center;
+    font-size:80%;
+}
+
+table.subscriptions tr th {
+    border-bottom: 1px solid #ddd;
+    background-color:#def;
+    padding:0 0.5em;
+    text-align:center;
+}
+
+table.subscriptions tr td {
+    font-size: 90%;
+    text-align:center;
+    padding:0.1em 1em;
+}
+
+table.subscriptions tr.modified td {
+    background-color: #ff9;
+}
+
+table.subscriptions tr td.modified {
+    background-color: #fd9;
+}
+
+table.subscriptions tr td.subscriber {
+    padding-left:0.3em;
+    text-align:left;
+    font-weight:bold;
+    color:#066;
+}
+
+table.subscriptions tr td {
+    border-bottom: 1px solid #ddd;
+}
+
+table.subscriptions tr .rel {
+    color:#066;
+    border-left: 1px solid #ddd;
+}
+
+p.help {
+    font-size:85%;
+    color:#999;
+    padding-left:0.3em;
+    font-style:italic;
+}
+
+div.searchmembers { border:0.1em solid #999; width:32em; margin:1em; }
+div.searchmembers h4 { font-size:70%; font-weight:normal; font-style:italic; float:left; width:8em; text-align:right; padding-right:0.5em; }
+div.searchmembers form { display:block; margin-bottom:0.3em; }
+div.searchmembers form select.membergroup { min-width:20em; }
+div.searchmembers form input.membersearch { width:19.5em; }
+div.searchmembers form input.button { width:5em; }
+div.searchmembers div.member-search-results { margin:1em; }
+div.searchmembers div.member-search-results ul { list-style-type:none; }
+div.searchmembers p { font-size:80%; color:#89b; }
+div.member-search-results li { font-size:85%; display:block; margin-top:0.5em; }
+div.searchmembers form textarea.emailinput { width:10em; height:9em;}
+div.searchmembers form input.submit-invite { margin:0.5em 8.4em; display:block; }
+div.searchmembers p.selectall { float:right; margin-top:0.5em; background-color:#ffb; }
+
+div.summary { background-color:#0f0; }
+div.summary div.description { float:left; }
+div.eventDetails { float:right; background-color:#fff; }
+form.subscriptions-form { clear:left; }
+</style>
+</metal:block>
+</head>
+<body>
+<div metal:fill-slot="main">
+  <div class="summary">
+   <div class="description">
+    <h3><em>Event invitations for:</em> <span tal:content="context/title">Item title</span></h3>
+    <p tal:content="context/Description">description</p>
+   </div>
+  </div>
+  <form class="subscriptions-form" method="POST">
+    <p class="help">The following users are subscribers to this event as either invitees, confirmed RSVPs, or attendees.  Each users status may be modified using the checkbox grid below, and you may add additional users using the form below.</p>
+    <table class="subscriptions">
+        <tr>
+            <th>User</th>
+            <th>Name</th>
+            <th>Subscriber type</th>
+            <th class="rel"
+                tal:repeat="idx view/indexes"
+                tal:content="idx/title">Subscription name</th>
+        </tr>
+        <tr tal:repeat="sub view/subscribers">
+          <tal:block define="namespace sub/namespace;
+                             fullname python:sub.name or u'';
+                             email python:sub.email or '';
+                             username python:sub.user or email;">
+            <td class="susbscriber">
+              <span tal:condition="username" tal:content="username">USERNAME</span>
+              &nbsp;
+              <tal:block condition="python:email and email != username">
+                &lt;<span class="email" tal:content="email">EMAIL_IF_DISTINCT_FROM_USERNAME</span>&gt;
+              </tal:block>
+            </td>
+            <td tal:content="python:fullname or view.member_fullname(username)">FULLNAME OR N/A</td>
+            <td tal:content="namespace">NAMESPACE OF USER</td>
+            <td class="rel"
+                tal:repeat="idx view/indexes">
+              <tal:define define="checked python:view.is_subscribed(sub, idx);
+                                  inputname python:'/'.join((idx,namespace,username));">
+                <tal:block condition="checked">
+                  <input type="checkbox"
+                         checked="CHECKED"
+                         name=""
+                         tal:attributes="name inputname" />
+                </tal:block>
+                <tal:block condition="python: not checked">
+                  <input type="checkbox"
+                         name=""
+                         tal:attributes="name inputname" />
+                </tal:block>
+              </tal:define>
+            </td>
+          </tal:block>
+        </tr>
+    </table>
+    <input type="submit" value="Save changes" name="submatrix_modify" />
+ </form>
+ <div class="searchmembers">
+  <h3>Add invitations</h3>
+  <form method="POST">
+    <h4>List by group</h4>
+    <select class="membergroup" name="membergroup" tal:define="groups view/enumerate_groups">
+      <option value="" tal:condition="view/result_group" tal:attributes="value view/result_group/getName" tal:content="python:view.result_group.title or view.result_group.getName()">SELECTED GROUP, IF ANY</option>
+      <option value="">All members</option>
+      <option value=""
+              tal:repeat="group groups"
+              tal:attributes="value group/getName"
+              tal:content="python:group.title or group.getName()">GROUP TITLE</option>
+    </select>
+    <input class="button" type="submit" value="List" id="listgroup" name="listgroup" />
+  </form>
+  <form method="POST">
+    <h4>Search members</h4>
+    <input class="membersearch" name="membersearch" /> <input class="button" type="submit" value="Search" />
+  </form>
+  <form method="POST">
+    <div class="member-search-results">
+      <tal:block define="hitcount python:len(view.add_result)">
+        <p tal:condition="hitcount">
+            Listing membership: <span tal:content="hitcount">#</span> members matching query
+            (<span style="font-weight:bold; font-size:120%;" tal:content="python:request.form.get('membersearch', request.form.get('membergroup', '')) or '[All members]'">QUERY GROUP OR SEARCH TERM</span>)
+        </p>
+      <p tal:condition="hitcount" class="selectall"><a href="javascript:void(0)">[Select all]</a></p>
+      </tal:block>
+      <ul>
+        <li tal:repeat="matched_user view/add_result">
+          <tal:block define="username python:matched_user[0];
+                             fullname python:matched_user[1];">
+            <input type="checkbox" name=""
+                   tal:attributes="name python:'/'.join(('member',username))" />
+            <span class="label" tal:content="fullname">USER FULL NAME</span>
+            (<span class="label" tal:content="username">USER ID</span>)
+          </tal:block>
+        </li>
+      </ul>
+    </div>
+    <h4>Enter email addresses (separated by commas and/or spaces)</h4>
+    <textarea class="emailinput" name="add_email"></textarea>
+    <input class="submit-invite" type="submit" value="Invite selected" />
+    <p>By submitting this form, all selected members and email addresses listed will be added to the invitiation.</p>
+  </form>
+ </div>
+
+<div class="event-content">
+<metal:block use-macro="context/event_view/macros/content-core">
+</metal:block>
+</div>
+
+<div class="debug-output" tal:condition="python: 'debug' in view.request">
+ <h4>Mail messsages for all invitations (debug log):</h4>
+ <tal:block repeat="msg view/debug_msg_log">
+  <hr />
+  <pre tal:content="msg">mail message output</pre>
+ </tal:block>
+</div>
+
+</div>
+</body>
+</html>

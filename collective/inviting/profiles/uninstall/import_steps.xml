@@ -1,0 +1,6 @@
+<import-steps>
+  <import-step id="collective.inviting-uninstallcomponents"
+    handler="collective.inviting.setuphandlers.uninstall_local_components"
+    title="uninstall collective.inviting local components" version="1.0">
+  </import-step>
+</import-steps>
