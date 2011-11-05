@@ -25,11 +25,11 @@ class DefaultProfileTest(unittest.TestCase):
     
     def test_skin_layer(self):
         tool = self.portal['portal_skins']
-        assert 'collective.inviting' in tool
+        assert 'collective_inviting' in tool
         skin = tool.getSkin(self.THEME)
         path = tool.getSkinPath(self.THEME).split(',')
         # check order in path:
-        assert path[0] == 'custom' and path[1] == 'collective.inviting'
+        assert path[0] == 'custom' and path[1] == 'collective_inviting'
         # get known object from skin:
         assert getattr(tool, 'collective.inviting.txt', None) is not None
         # try to acquire same object from portal:
