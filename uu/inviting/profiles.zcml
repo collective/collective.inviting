@@ -12,4 +12,12 @@
         provides="Products.GenericSetup.interfaces.EXTENSION"
         />
 
+    <genericsetup:registerProfile
+        name="uninstall"
+        title="Uninstall uu.intiving"
+        directory="profiles/uninstall"
+        description="Uninstall event inviation add-on uu.inviting"
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
 </configure>

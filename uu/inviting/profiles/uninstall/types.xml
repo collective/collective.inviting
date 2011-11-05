@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<object name="portal_types" meta_type="Plone Types Tool">
+ <!-- restore default FTI for ATCT event (default actions);
+      see types/Event.xml ; remove FTI and reinstall default -->
+ <object
+    remove="True"
+    name="Event"
+    meta_type="Factory-based Type Information with dynamic views"/>
+ <object name="Event"
+    meta_type="Factory-based Type Information with dynamic views"/>
+</object>

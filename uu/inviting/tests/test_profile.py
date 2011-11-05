@@ -3,6 +3,7 @@ from plone.app.testing import TEST_USER_ID, setRoles
 from zope.component import queryUtility, getSiteManager
 
 from uu.inviting.tests.layers import DEFAULT_PROFILE_TESTING
+from uu.inviting.tests.layers import POST_UNINSTALL_PROFILE_TESTING
 from uu.subscribe.interfaces import ISubscribers, ISubscriptionCatalog
 from uu.subscribe.interfaces import ISubscriptionKeys
 
@@ -57,4 +58,44 @@ class DefaultProfileTest(unittest.TestCase):
         sm = getSiteManager(self.portal)
         assert subkeys is sm.queryUtility(ISubscriptionKeys)
 
+
+class UninstallProfileTest(unittest.TestCase):
+    """Test uninstall profile correctly removes configuration, components"""
+    
+    THEME = 'Sunburst Theme'
+    
+    layer = POST_UNINSTALL_PROFILE_TESTING
+    
+    def setUp(self):
+        self.portal = self.layer['portal']
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+    
+    def test_uninstalled_container(self):
+        """test uninstall of persistent subscribers container utility"""
+        container = queryUtility(ISubscribers)
+        assert container is None
+        sm = getSiteManager(self.portal)
+        assert sm.queryUtility(ISubscribers) is None
+        assert ISubscribers not in sm.utilities.__dict__['_provided']
+        assert ISubscribers not in sm.utilities._subscribers[0]
+    
+    def test_uninstalled_catalog(self):
+        """test uninstall of persistent subscription catalog utility"""
+        catalog = queryUtility(ISubscriptionCatalog)
+        assert catalog is None
+        sm = getSiteManager(self.portal)
+        assert sm.queryUtility(ISubscriptionCatalog) is None
+        assert ISubscriptionCatalog not in sm.utilities.__dict__['_provided']
+        assert ISubscriptionCatalog not in sm.utilities._subscribers[0]
+    
+    def test_uninstalled_subkeys(self):
+        """
+        test uninstalls of persistent subscription keys mapping utility
+        """
+        subkeys = queryUtility(ISubscriptionKeys)
+        assert subkeys is None
+        sm = getSiteManager(self.portal)
+        assert sm.queryUtility(ISubscriptionKeys) is None
+        assert ISubscriptionKeys not in sm.utilities.__dict__['_provided']
+        assert ISubscriptionKeys not in sm.utilities._subscribers[0]
 

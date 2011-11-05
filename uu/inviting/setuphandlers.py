@@ -33,3 +33,27 @@ def install_subscription_keys(context):
     subkeys = SubscriptionKeys()
     _install_local_utility(context, subkeys, ISubscriptionKeys)
 
+
+def _uninstall_local_utility(context, iface, name=u''):
+    sm = getSiteManager(context.getSite())
+    component = sm.queryUtility(iface)
+    if component is not None:
+        if name:
+            sm.unregisterUtility(component, iface, name=name)
+        else:
+            sm.unregisterUtility(component, iface)
+        logger.info('Uninstall %s local utility in site.' % iface)
+        del component
+        if not name:
+            sm.utilities.unsubscribe((), iface)
+        if iface in sm.utilities.__dict__['_provided']:
+            del sm.utilities.__dict__['_provided'][iface]
+        if iface in sm.utilities._subscribers[0]:
+            del sm.utilities._subscribers[0][iface]
+
+
+def uninstall_local_components(context):
+    _uninstall_local_utility(context, ISubscribers)
+    _uninstall_local_utility(context, ISubscriptionCatalog)
+    _uninstall_local_utility(context, ISubscriptionKeys)
+
