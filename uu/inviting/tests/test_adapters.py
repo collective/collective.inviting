@@ -9,6 +9,7 @@ from uu.subscribe.interfaces import ISubscribers, ISubscriptionCatalog
 from uu.subscribe.interfaces import IItemSubscriber
 from uu.subscribe.subscriber import ItemSubscriber
 
+
 class AdapterTest(unittest.TestCase):
     """Test default profile's installed configuration settings"""
     
