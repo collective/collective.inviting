@@ -1,4 +1,4 @@
-include *.txt docs/*.txt
+include *.txt doc/*.txt
 recursive-include collective *
 global-exclude *.pyc .bzr
 
