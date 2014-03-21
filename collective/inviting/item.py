@@ -1,8 +1,10 @@
 
 from zope.component import adapts
 from zope.interface import implements
-from zope.app.component.hooks import getSite
-from Products.Archetypes.interfaces import IReferenceable
+try:
+    from zope.component.hooks import getSite
+except:
+    from zope.app.component.hooks import getSite
 
 from collective.subscribe.interfaces import IUIDStrategy, IItemResolver
 
@@ -34,10 +36,10 @@ class ItemUID(object):
     implements(IUIDStrategy)
     if HAS_AT:
         adapts(IReferenceable)
-    
+
     def __init__(self, context):
         self.context = context
-    
+
     def getuid(self):
         if HAS_PLONE_UUID:
             uid = IUUID(self.context, None)
@@ -47,18 +49,18 @@ class ItemUID(object):
             if IReferenceable.providedBy(self.context):
                 return self.context.UID()
         return None
-    
+
     __call__ = getuid
 
 
 class ItemResolver(object):
     """utility class for local UID to object lookups"""
-    
+
     implements(IItemResolver)
-    
+
     def ___init__(self):
         pass #TODO rewrite ctor
-    
+
     def get(self, uid):
         """return resolved object for uid or None"""
         site = getSite()

@@ -1,5 +1,4 @@
 from email import encoders
-from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -7,11 +6,13 @@ from StringIO import StringIO
 
 import icalendar
 from Acquisition import aq_inner
-from zope.component import queryUtility, getUtility
-from zope.app.component.hooks import getSite
+try:
+    from zope.component.hooks import getSite
+except ImportError:
+    from zope.app.component.hooks import getSite
+
 from Products.ATContentTypes.lib.calendarsupport import (PRODID, VCS_HEADER,
     VCS_FOOTER, n2rn)
-from Products.CMFCore.interfaces import ISiteRoot
 from Products.CMFCore.utils import getToolByName
 
 from collective.subscribe.interfaces import IUIDStrategy
@@ -22,7 +23,7 @@ from collective.inviting.mail import MailRecipient, invitation_sender
 # Template (format) strings for email invitation messages:
 RSVP_URL_TEMPLATE = '%(SITE_URL)s/@@status?token=%(TOKEN)s'
 INVITE_EMAIL_SUBJ = 'Invitation: %(ITEM_TITLE)s'
-INVITE_EMAIL_BODY = """ 
+INVITE_EMAIL_BODY = """
 %(FROM_NAME)s (%(FROM_EMAIL)s) has invited you to an event:
 
 What: %(ITEM_TITLE)s
@@ -45,7 +46,7 @@ More information:
 A vCal file, suitable for adding this event to calendaring software such as
 iCal, Microsoft Outlook, and Google Calendar is attached.
 
---- 
+---
 
 Received this email in error?  Have questions?
 
@@ -59,7 +60,7 @@ class InvitationEmail(object):
     view/adapter for one sender, one item on construction to render email
     message multiple recipients, one recipient per call.
     """
-    
+
     def __init__(self, context, request):
         self.context = context #event item
         self.request = request
@@ -69,11 +70,10 @@ class InvitationEmail(object):
         self._loaded = True
         self.uid = IUIDStrategy(self.context).getuid()
         self.portal = getSite()
-        altportal = getSite()
         self.sender = invitation_sender(self.portal)
         self.localize = getToolByName(self.portal, 'translation_service')
         self.timefn = self.localize.ulocalized_time
-    
+
     def _recipient_from_request(self):
         form = self.request.form
         address = form.get('address', self.sender.from_address)
@@ -81,7 +81,7 @@ class InvitationEmail(object):
         if isinstance(name, str):
             name = name.decode('utf-8')
         return MailRecipient(address, name)
-    
+
     def _set_headers(self, message, recipient):
         sender = self.sender
         # From: header
@@ -105,7 +105,7 @@ class InvitationEmail(object):
             message['Reply-to'] = sender.reply_address
         # Subject: header
         message['Subject'] = 'Invitation: %s' % self.context.Title()
-    
+
     def _vcal(self):
         """
         Make vCal file stream for item context. VCS is modified with use
@@ -130,14 +130,14 @@ class InvitationEmail(object):
             description = '%s\n\n  More info:\n\n  %s\n\n' % (description, url)
             journal[0].set('description', description)
         return str(parsed) #return modified (description) vcs
-    
+
     def _rsvp_url(self):
         token = self.request.get('token', None)
         if token is None:
             return self.portal.absolute_url()
         return RSVP_URL_TEMPLATE % {'SITE_URL': self.portal.absolute_url(),
                                     'TOKEN' : token}
-    
+
     def __call__(self, *args, **kwargs):
         if not self._loaded:
             self._load_state()

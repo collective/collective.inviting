@@ -3,6 +3,7 @@
   xmlns:cmf="http://namespaces.zope.org/cmf"
   xmlns:five="http://namespaces.zope.org/five">
 
+  <include package="Products.CMFCore" file="permissions.zcml" />
   <five:registerPackage package="." initialize=".zope2.initialize" />
 
   <include package=".browser" />
@@ -12,7 +13,7 @@
 
   <!-- register directory view for policy product skin overrides -->
   <cmf:registerDirectory name="collective_inviting" />
-  
+
   <adapter
     factory=".item.ItemUID"
     provides="collective.subscribe.interfaces.IUIDStrategy"
@@ -24,7 +25,7 @@
     provides=".interfaces.ISubscriberItems"
     for="collective.subscribe.interfaces.IItemSubscriber"
     />
-  
+
   <adapter
     factory=".adapters.ContentSubscribers"
     provides=".interfaces.IContentSubscribers"

@@ -4,7 +4,8 @@ Changelog
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Plone 4.2+ compatibility.
+  [thomasdesvenain]
 
 
 0.1.1 (2012-08-04)
@@ -17,7 +18,7 @@ Changelog
 
 - Initial release [seanupton].
 
-- Renamed from uu.inviting to collective.inviting, all dependencies on 
+- Renamed from uu.inviting to collective.inviting, all dependencies on
   uu.subscribe moved to renamed collective.subscribe.
 
 - Install and uninstall profiles for three local persistent utility components.
